@@ -7,23 +7,27 @@ export async function sendEmail({ to, subject, text, html }) {
   try {
     //configuring Gmail SMTP
     const transporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
+      host: "email-smtp.ap-south-1.amazonaws.com", //process.env.SMTP_HOST,
+      port: 25, //process.env.SMTPS_PORT,
       secure: false,
+      requireTLS: true,
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD
+        pass: process.env.SMTP_PASS
+      },
+      tls: {
+        rejectUnauthorized: false // Ignore self-signed certificate error
       }
     });
     //defining email options
     const mailOptions = {
-      from: process.env.EMAIL_FROM,
-      to,
+      from: "pongangairamannks2000@gmail.com", // process.env.EMAIL_FROM,
+      to: "ashishiit9@gmail.com",
       subject,
       text,
       html
     };
+
     //sending email
     await transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
