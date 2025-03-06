@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 
 import videoRouter from "./routes/videoRoutes.js";
 import emailRouter from "./routes/emailRoutes.js";
-import authRouter from "./routes/authroutes.js";
+import authRouter from "./routes/authRoutes.js";
 
 //load environment variables from .env file
 dotenv.config();
