@@ -55,9 +55,10 @@ authRouter.post("/login", async (req, res) => {
         expiresIn: process.env.TOKEN_EXPIRY
       }
     );
+
     res.json({
       token,
-      user
+      message: "Logged in Successfully"
     });
   } catch (error) {
     res.status(500).json({ Error: "Login failed" });
