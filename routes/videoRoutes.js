@@ -7,6 +7,7 @@ import Video from "../models/video.js";
 import ffmpegPath from "@ffmpeg-installer/ffmpeg";
 import { S3Client } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
+import { uploadToS3 } from "../utils/uploadToS3.js";
 
 dotenv.config();
 
@@ -15,34 +16,34 @@ ffmpeg.setFfmpegPath(ffmpegPath.path);
 const videoRouter = express.Router();
 
 // ✅ Configure AWS S3
-const s3 = new S3Client({
-  region: "ap-south-1", // process.env.AWS_S3_REGION
-  credentials: {
-    accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY
-  }
-});
+// const s3 = new S3Client({
+//   region: "ap-south-1", // process.env.AWS_S3_REGION
+//   credentials: {
+//     accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+//     secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY
+//   }
+// });
 
 // ✅ Configure Multer-S3 for Video & Poster Uploads
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: "cineflow-videofiles", // process.env.AWS_S3_BUCKET
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    key: (req, file, cb) => {
-      // Define the upload path based on file type
-      const fileType = file.mimetype.startsWith("video/")
-        ? "videos"
-        : "posters";
-      cb(null, `${fileType}/${Date.now()}-${path.basename(file.originalname)}`);
-    }
-  })
-});
+// const upload = multer({
+//   storage: multerS3({
+//     s3: s3,
+//     bucket: "cineflow-videofiles", // process.env.AWS_S3_BUCKET
+//     contentType: multerS3.AUTO_CONTENT_TYPE,
+//     key: (req, file, cb) => {
+//       // Define the upload path based on file type
+//       const fileType = file.mimetype.startsWith("video/")
+//         ? "videos"
+//         : "posters";
+//       cb(null, `${fileType}/${Date.now()}-${path.basename(file.originalname)}`);
+//     }
+//   })
+// });
 
 // ✅ API Route: Upload Video & Poster to AWS S3
 videoRouter.post(
   "/upload",
-  upload.fields([
+  uploadToS3.fields([
     { name: "url", maxCount: 1 }, // Video file
     { name: "poster", maxCount: 1 } // Poster image
   ]),
