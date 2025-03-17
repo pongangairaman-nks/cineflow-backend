@@ -8,6 +8,7 @@ import ffmpegPath from "@ffmpeg-installer/ffmpeg";
 import { S3Client } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 import { uploadToS3 } from "../utils/uploadToS3.js";
+import { authenticationToken } from "../middlewares/authenticationMiddleware.js";
 
 dotenv.config();
 
@@ -95,6 +96,63 @@ videoRouter.get("/getAllVideos", async (req, res) => {
     res.status(500).json({
       message: "Error Fetching Videos",
       error: error.message
+    });
+  }
+});
+
+videoRouter.post("/:videoId/like", authenticationToken, async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.videoId);
+    if (!video) res.status(404).json({ message: "Error! Video not found" });
+    //getting the user id from the authentication middleware which decodes the token and retuen the user data
+    const userId = req.user.id;
+    const isLiked = video.likesBy.includes(userId);
+    // console.log("userId", userId);
+
+    if (isLiked) {
+      video.likes -= 1;
+      video.likesBy = video.likesBy.filter((id) => {
+        console.log("id", id);
+        console.log("id.toString() ->", id.toString());
+        // console.log("id type", typeof id.type);
+        return id.toString() != userId;
+      });
+      console.log(video.likesBy);
+    } else {
+      video.likes += 1;
+      video.likesBy.push(userId);
+    }
+    await video.save();
+    res.status(200).json({
+      message: "Updated successfully",
+      likes: video.likes
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating likes"
+    });
+  }
+});
+
+videoRouter.post("/:videoId/comment", authenticationToken, async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.videoId);
+    console.log("video", video);
+    if (!video) res.status(404).json({ message: "Error! Video not found" });
+    //getting the user id from the authentication middleware which decodes the token and retuen the user data
+    const userId = req.user.id;
+    video.comments.push({
+      user: userId,
+      text: req.body.text
+    });
+    await video.save();
+    res.status(200).json({
+      message: "Updated successfully",
+      comments: video.comments
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating comments"
     });
   }
 });
