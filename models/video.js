@@ -30,6 +30,7 @@ const VideoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  aiDescription: String,
   likes: {
     type: Number,
     default: 0
