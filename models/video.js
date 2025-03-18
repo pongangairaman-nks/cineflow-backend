@@ -1,19 +1,6 @@
 import mongoose from "mongoose";
-
-const CommentSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  },
-  text: {
-    type: String,
-    required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now()
-  }
-});
+import { CommentSchema } from "./comment";
+import { LikeSchema } from "./like";
 
 const VideoSchema = new mongoose.Schema({
   title: {
@@ -35,7 +22,7 @@ const VideoSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  likesBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], //stores user id
+  likesBy: [LikeSchema],
   comments: [CommentSchema],
   createdAt: {
     type: Date,

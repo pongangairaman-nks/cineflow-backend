@@ -9,6 +9,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 import { uploadToS3 } from "../utils/uploadToS3.js";
 import { authenticationToken } from "../middlewares/authenticationMiddleware.js";
+import WatchHistory from "../models/watchHistory.js";
 
 dotenv.config();
 
@@ -106,21 +107,20 @@ videoRouter.post("/:videoId/like", authenticationToken, async (req, res) => {
     if (!video) res.status(404).json({ message: "Error! Video not found" });
     //getting the user id from the authentication middleware which decodes the token and retuen the user data
     const userId = req.user.id;
-    const isLiked = video.likesBy.includes(userId);
+    const isLiked = video.likesBy.some(
+      (item) => item.videoId.toString() === req.params.videoId
+    );
     // console.log("userId", userId);
 
     if (isLiked) {
       video.likes -= 1;
-      video.likesBy = video.likesBy.filter((id) => {
-        console.log("id", id);
-        console.log("id.toString() ->", id.toString());
-        // console.log("id type", typeof id.type);
-        return id.toString() != userId;
+      video.likesBy = video.likesBy.filter((item) => {
+        return item.userId.toString() != userId;
       });
       console.log(video.likesBy);
     } else {
       video.likes += 1;
-      video.likesBy.push(userId);
+      video.likesBy.push({ userId: userId, videoId: req.params.videoId });
     }
     await video.save();
     res.status(200).json({
@@ -153,6 +153,37 @@ videoRouter.post("/:videoId/comment", authenticationToken, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error updating comments"
+    });
+  }
+});
+
+videoRouter.post("/watchHistory", authenticationToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const videoId = req.body.videoId;
+    const watchData = await WatchHistory.findById(userId);
+    if (watchData) {
+      const videoIdExist = watchData.videoIds?.some(
+        (id) => id.toString() === videoId
+      );
+      if (!videoIdExist) {
+        watchData.videoIds.push(videoId);
+      }
+    } else {
+      const newWatchData = new WatchHistory({
+        userId,
+        videoIds: [videoId]
+      });
+      await newWatchData.save();
+      res.status(200).json({
+        message: "Watch history updated successfully",
+        videoIds: newWatchData.videoIds
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating watch history",
+      error
     });
   }
 });

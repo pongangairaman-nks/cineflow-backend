@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { CommentSchema } from "./comment";
+import { LikeSchema } from "./like";
 
 //designing the schema of the user
 const UserSchema = new mongoose.Schema({
@@ -9,7 +11,9 @@ const UserSchema = new mongoose.Schema({
     required: true
   },
   password: String,
-  profileUrl: String
+  profileUrl: String,
+  likesBy: [LikeSchema],
+  comments: [CommentSchema]
 });
 
 //creation of user model
