@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { CommentSchema } from "./comment";
-import { LikeSchema } from "./like";
+import { CommentSchema } from "./comment.js";
+import { LikeSchema } from "./like.js";
 
 //designing the schema of the user
 const UserSchema = new mongoose.Schema({

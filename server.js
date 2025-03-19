@@ -13,6 +13,11 @@ import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import aiRouter from "./routes/aiRoutes.js";
 
+import { ApolloServer } from "@apollo/server";
+import typeDefs from "./graphql/Schema.js";
+import resolvers from "./graphql/resolvers.js";
+import { expressMiddleware } from "@apollo/server/express4";
+
 //load environment variables from .env file
 dotenv.config();
 
@@ -38,13 +43,30 @@ mongoose
   .then(() => console.log("Mongodb connected"))
   .catch((err) => console.log("MongoDB Error:" + err));
 
-app.use("/api/auth", authRouter);
-app.use("/api/video", videoRouter);
-app.use("/api/email", emailRouter);
-app.use("/api/user", userRouter);
-app.use("/api/ai", aiRouter);
-
 //set port number default to 5000
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Backend running on ${PORT}`));
+// set up apollo graphql server
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers
+});
+
+async function startServer() {
+  //starting apollo server
+  await server.start();
+  app.use("/graphql", expressMiddleware(server));
+  // start express server
+  app.listen(PORT, () =>
+    console.log(`Server running on http://localhost:${PORT}/graphql`)
+  );
+}
+
+startServer();
+
+// app.use("/api/auth", authRouter);
+// app.use("/api/video", videoRouter);
+// app.use("/api/email", emailRouter);
+// app.use("/api/user", userRouter);
+// app.use("/api/ai", aiRouter);

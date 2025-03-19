@@ -1,6 +1,6 @@
 import Video from "../models/video.js";
 import express from "express";
-import OpenAI from "openai";
+// import OpenAI from "openai";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { authenticationToken } from "../middlewares/authenticationMiddleware.js";

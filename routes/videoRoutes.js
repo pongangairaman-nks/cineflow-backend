@@ -142,7 +142,8 @@ videoRouter.post("/:videoId/comment", authenticationToken, async (req, res) => {
     //getting the user id from the authentication middleware which decodes the token and retuen the user data
     const userId = req.user.id;
     video.comments.push({
-      user: userId,
+      userId: userId,
+      videoId: req.params.videoId,
       text: req.body.text
     });
     await video.save();

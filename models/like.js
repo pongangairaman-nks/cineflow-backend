@@ -14,3 +14,5 @@ export const LikeSchema = new mongoose.Schema({
     default: Date.now()
   }
 });
+
+export default mongoose.model("Like", LikeSchema);
