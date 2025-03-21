@@ -49,6 +49,8 @@ const typeDefs = gql`
       posterUrl: String!
     ): Video
 
+    deleteVideo(id: ID!): Video
+
     likeVideo(videoId: ID!, userId: ID!): Video
 
     addComment(videoId: ID!, userId: ID!, text: String!): Video

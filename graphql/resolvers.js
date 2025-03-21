@@ -15,6 +15,17 @@ const resolvers = {
       const newVideo = new Video({ title, type, genre, url, posterUrl });
       return await newVideo.save();
     },
+    deleteVideo: async (_, { id }) => {
+      try {
+        const video = await Video.findById(id);
+        if (!video) {
+          throw new Error("Video not found");
+        }
+        return await Video.findByIdAndDelete(id);
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    },
     likeVideo: async (_, { input }) => {
       const { videoId, userId } = input;
       const video = await Video.findById(videoId);

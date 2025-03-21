@@ -48,25 +48,29 @@ const PORT = process.env.PORT || 5000;
 
 // set up apollo graphql server
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers
-});
+// const server = new ApolloServer({
+//   typeDefs,
+//   resolvers
+// });
 
-async function startServer() {
-  //starting apollo server
-  await server.start();
-  app.use("/graphql", expressMiddleware(server));
-  // start express server
-  app.listen(PORT, () =>
-    console.log(`Server running on http://localhost:${PORT}/graphql`)
-  );
-}
+// async function startServer() {
+//   //starting apollo server
+//   await server.start();
+//   app.use("/graphql", expressMiddleware(server));
+//   // start express server
+//   app.listen(PORT, () =>
+//     console.log(`Server running on http://localhost:${PORT}/graphql`)
+//   );
+// }
 
-startServer();
+// startServer();
 
-// app.use("/api/auth", authRouter);
-// app.use("/api/video", videoRouter);
-// app.use("/api/email", emailRouter);
-// app.use("/api/user", userRouter);
-// app.use("/api/ai", aiRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/video", videoRouter);
+app.use("/api/email", emailRouter);
+app.use("/api/user", userRouter);
+app.use("/api/ai", aiRouter);
+
+app.listen(PORT, () =>
+  console.log(`Server running on http://localhost:${PORT}`)
+);

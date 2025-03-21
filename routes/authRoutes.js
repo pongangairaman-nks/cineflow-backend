@@ -5,8 +5,13 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import { uploadToS3 } from "../utils/uploadToS3.js";
+import cors from "cors";
+import dotenv from "dotenv";
+
 //create a new express router
 const authRouter = express.Router();
+
+dotenv.config();
 
 // register user API ("/api/auth/register")
 
