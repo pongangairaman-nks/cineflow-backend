@@ -1,6 +1,7 @@
 import Video from "../models/video.js";
 import Comment from "../models/comment.js";
 import Like from "../models/like.js";
+import User from "../models/user.js";
 
 const resolvers = {
   Query: {
@@ -53,8 +54,46 @@ const resolvers = {
         createdAt: new Date().toISOString()
       });
       return await video.save();
+    },
+    register: async (_, { name, email, password }) => {
+
+      const existing = await User.findOne({ email });
+
+      if (existing) throw new Error("User already exists");
+
+      const hashed = await bcrypt.hash(password, 10);
+
+      const user = await User.create({ name, email, password: hashed });
+
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+
+        expiresIn: "7d"
+
+      });
+
+      return { token, user };
+
+    },
+    login: async (_, { email, password }) => {
+
+      const user = await User.findOne({ email });
+
+      if (!user) throw new Error("User not found");
+
+      const valid = await bcrypt.compare(password, user.password);
+
+      if (!valid) throw new Error("Invalid password");
+
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+
+        expiresIn: "7d"
+
+      });
+
+      return { token, user };
+
     }
   }
-};
+}
 
 export default resolvers;

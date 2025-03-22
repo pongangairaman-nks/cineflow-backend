@@ -37,6 +37,7 @@ const typeDefs = gql`
   type Query {
     getAllVideos: [Video!]!
     getVideoById(id: ID!): Video
+    me: User
   }
 
   #modifying data
@@ -54,6 +55,28 @@ const typeDefs = gql`
     likeVideo(videoId: ID!, userId: ID!): Video
 
     addComment(videoId: ID!, userId: ID!, text: String!): Video
+    
+    register(name: String!, email: String!, password: String!): AuthPayload
+
+    login(email: String!, password: String!): AuthPayload
+  }
+
+  type User {
+
+    _id: ID!
+
+    name: String!
+
+    email: String!
+
+  }
+ 
+  type AuthPayload {
+
+    token: String!
+
+    user: User!
+
   }
 `;
 

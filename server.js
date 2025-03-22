@@ -6,15 +6,16 @@ import cors from "cors";
 import dotenv from "dotenv";
 //ORM to interact with database
 import mongoose from "mongoose";
+import { authenticationToken } from './middlewares/authenticationMiddleware.js'
 
-import videoRouter from "./routes/videoRoutes.js";
-import emailRouter from "./routes/emailRoutes.js";
-import authRouter from "./routes/authRoutes.js";
-import userRouter from "./routes/userRoutes.js";
-import aiRouter from "./routes/aiRoutes.js";
+// import videoRouter from "./routes/videoRoutes.js";
+// import emailRouter from "./routes/emailRoutes.js";
+// import authRouter from "./routes/authRoutes.js";
+// import userRouter from "./routes/userRoutes.js";
+// import aiRouter from "./routes/aiRoutes.js";
 
 import { ApolloServer } from "@apollo/server";
-import typeDefs from "./graphql/Schema.js";
+import typeDefs from "./graphql/schema.js";
 import resolvers from "./graphql/resolvers.js";
 import { expressMiddleware } from "@apollo/server/express4";
 
@@ -48,29 +49,33 @@ const PORT = process.env.PORT || 5000;
 
 // set up apollo graphql server
 
-// const server = new ApolloServer({
-//   typeDefs,
-//   resolvers
-// });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => {
+    const user = authenticationToken(req);
+    return { user };
+  }
+});
 
-// async function startServer() {
-//   //starting apollo server
-//   await server.start();
-//   app.use("/graphql", expressMiddleware(server));
-//   // start express server
-//   app.listen(PORT, () =>
-//     console.log(`Server running on http://localhost:${PORT}/graphql`)
-//   );
-// }
+async function startServer() {
+  //starting apollo server
+  await server.start();
+  app.use("/graphql", expressMiddleware(server));
+  // start express server
+  app.listen(PORT, () =>
+    console.log(`Server running on http://localhost:${PORT}/graphql`)
+  );
+}
 
-// startServer();
+startServer();
 
-app.use("/api/auth", authRouter);
-app.use("/api/video", videoRouter);
-app.use("/api/email", emailRouter);
-app.use("/api/user", userRouter);
-app.use("/api/ai", aiRouter);
+// app.use("/api/auth", authRouter);
+// app.use("/api/video", videoRouter);
+// app.use("/api/email", emailRouter);
+// app.use("/api/user", userRouter);
+// app.use("/api/ai", aiRouter);
 
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
+// app.listen(PORT, () =>
+//   console.log(`Server running on http://localhost:${PORT}`)
+// );
