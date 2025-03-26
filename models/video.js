@@ -3,20 +3,11 @@ import { CommentSchema } from "./comment.js";
 import { LikeSchema } from "./like.js";
 
 const VideoSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true
-  },
+  title: String,
   type: String,
   genre: String,
-  url: {
-    type: String,
-    required: true
-  }, //link to the video file in the storage (cloud or local)
-  posterUrl: {
-    type: String,
-    required: true
-  },
+  url: String, //link to the video file in the storage (cloud or local)
+  poster:String,
   aiDescription: String,
   likes: {
     type: Number,

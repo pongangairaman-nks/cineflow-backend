@@ -4,34 +4,27 @@ import bcrypt from "bcryptjs";
 //generate jwt token for authentication
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import { uploadToS3 } from "../utils/uploadToS3.js";
-import cors from "cors";
-import dotenv from "dotenv";
 
 //create a new express router
 const authRouter = express.Router();
 
-dotenv.config();
-
 // register user API ("/api/auth/register")
 
-authRouter.post("/register", uploadToS3.single("avatar"), async (req, res) => {
+authRouter.post("/register", async (req, res) => {
   try {
     //extract user details from request body
     const { name, email, password } = req.body;
     //hash password for security
     const hashedPassword = await bcrypt.hash(password, 10);
-    const profileImage = req.files["avatar"][0];
     //create a new user instance
     const user = new User({
       name,
       email,
       password: hashedPassword,
-      profileUrl: profileImage.location
     });
     //save user to database
     await user.save();
-    res.json({ message: "User Registered Successfully", user });
+    res.status(201).json({status:201, message: "User Registered Successfully" });
   } catch (err) {
     res
       .status(500)
@@ -45,27 +38,27 @@ authRouter.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({
-      email
+      email,
     });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({
-        error: "Invalid Credentials"
+        error: "Invalid Credentials",
       });
     }
     const token = jwt.sign(
       {
         id: user._id,
-        email: user.email
+        email: user.email,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: process.env.TOKEN_EXPIRY
+        expiresIn: process.env.TOKEN_EXPIRY,
       }
     );
-
-    res.json({
+    res.status(200).json({
+      status: 200,
       token,
-      message: "Logged in Successfully"
+      user,
     });
   } catch (error) {
     res.status(500).json({ Error: "Login failed" });
